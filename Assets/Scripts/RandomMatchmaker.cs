@@ -10,34 +10,26 @@ public class RandomMatchmaker : Photon.PunBehaviour
 	
 	void OnGUI()
 	{
-		if (Debug.isDebugBuild) 
+		GUILayout.BeginVertical();
+		
+		if (!PhotonNetwork.connected)
 		{
-			GUILayout.BeginVertical();
-			
-			if (!PhotonNetwork.connected)
-			{
-				ShowConnectingGUI();
-				return;
-			}
-			
-			GUI.contentColor = Color.black;
-			GUILayout.Label (PhotonNetwork.connectionStateDetailed.ToString ());
-
-			addPlayerNameGUI();
-			addRoomInfoGUI();
-
-			GUILayout.EndVertical();
+			ShowConnectingGUI();
+			return;
 		}
-
+		
+		GUI.contentColor = Color.black;
+		GUILayout.Label (PhotonNetwork.connectionStateDetailed.ToString ());
+		
+		addPlayerNameGUI();
+		addRoomInfoGUI();
+		GUILayout.EndVertical();	
 	}
 
 	void addRoomInfoGUI()
 	{
 		GUILayout.Label ("Room:" + PhotonNetwork.room.name);
-		foreach (var player in PhotonNetwork.playerList)
-		{
-			GUILayout.Label ("Players in room: " + player.name);
-		}
+		GUILayout.Label ("Players in room: " + PhotonNetwork.playerList.Length);
 	}
 
 	void addPlayerNameGUI()
