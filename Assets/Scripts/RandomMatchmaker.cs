@@ -3,9 +3,18 @@ using System.Collections;
 
 public class RandomMatchmaker : Photon.PunBehaviour 
 {
-	void Start()
+	public GameManager gameManger;
+	string roomName = "No Room";
+
+	void Awake()
 	{
-		PhotonNetwork.ConnectUsingSettings("0.1");
+		//PhotonNetwork.logLevel = NetworkLogLevel.Full;
+		if (!PhotonNetwork.connected)
+		{
+			PhotonNetwork.ConnectUsingSettings("0.1");
+		}
+		
+		PhotonNetwork.playerName = PlayerPrefs.GetString("playerName", "Guest" + Random.Range(1, 9999));
 	}
 	
 	void OnGUI()
@@ -20,7 +29,7 @@ public class RandomMatchmaker : Photon.PunBehaviour
 		
 		GUI.contentColor = Color.black;
 		GUILayout.Label (PhotonNetwork.connectionStateDetailed.ToString ());
-		
+
 		addPlayerNameGUI();
 		addRoomInfoGUI();
 		GUILayout.EndVertical();	
@@ -28,7 +37,7 @@ public class RandomMatchmaker : Photon.PunBehaviour
 
 	void addRoomInfoGUI()
 	{
-		GUILayout.Label ("Room:" + PhotonNetwork.room.name);
+		GUILayout.Label ("Room:" + roomName);
 		GUILayout.Label ("Players in room: " + PhotonNetwork.playerList.Length);
 	}
 
@@ -53,8 +62,17 @@ public class RandomMatchmaker : Photon.PunBehaviour
 	void OnPhotonRandomJoinFailed()
 	{
 		Debug.Log("Can't join random room!");
-		PhotonNetwork.CreateRoom(null);			
-		//if null is passed a random GUID room ID is created HG
+		PhotonNetwork.CreateRoom(null);
+	}
+
+	public override void OnJoinedRoom ()
+	{
+		Debug.Log("Joined room!");
+		roomName = PhotonNetwork.room.name;
+
+		Debug.Log("Starting game");
+		Debug.Log ("Actor ID = " + PhotonNetwork.player.ID);
+		gameManger.StartGame();
 	}
 
 	void ShowConnectingGUI()
@@ -62,5 +80,10 @@ public class RandomMatchmaker : Photon.PunBehaviour
 		GUI.contentColor = Color.black;
 		GUILayout.Label("Connecting to Photon server.");
 		GUILayout.EndArea();
+	}
+
+	public override void OnPhotonPlayerConnected (PhotonPlayer newPlayer)
+	{
+
 	}
 }
